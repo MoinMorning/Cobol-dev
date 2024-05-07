@@ -10,7 +10,6 @@ WORKING-STORAGE SECTION.
 
 PROCEDURE DIVISION.
 Begin.
-    MOVE 0 TO MenuOption
     PERFORM UNTIL MenuOption = 3
         PERFORM MenuOption
     END-PERFORM.
@@ -39,12 +38,16 @@ MenuAction.
 AddMachine.
     DISPLAY "Enter Machine Number to add: "
     ACCEPT MachineNumber
-    ADD MachineNumber TO MachineList
+    ADD 1 TO MachineList(MachineNumber)
     PERFORM MenuOption.
 
 CheckMachineNumbers.
     DISPLAY "Machine Numbers in the company:"
     PERFORM VARYING MachineIndex FROM 1 BY 1 UNTIL MachineIndex > 100
-        DISPLAY MachineList(MachineIndex)
+        IF MachineList(MachineIndex) NOT = 0
+            DISPLAY MachineList(MachineIndex)
     END-PERFORM.
     PERFORM MenuOption.
+
+BEGIN.
+    PERFORM Begin.
