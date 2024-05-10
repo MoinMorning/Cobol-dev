@@ -2,13 +2,26 @@
        PROGRAM-ID. CompanyAdminSystem.
        AUTHOR. lek.
 
+       ENVIRONMENT DIVISION. 
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT MachineFile ASSIGN TO "machines.txt"
+                  ORGANIZATION IS LINE SEQUENTIAL.
+
        DATA DIVISION.
+       FILE SECTION.
+       FD MachineFile.
+       01 MachineRecord.
+           05 MachineNum PIC 9(5).
+
+
+
        WORKING-STORAGE SECTION.
        01 ws-MenuOption PIC 9.
        01 ws-MachineNumber PIC 9(5) VALUE 0.
        01 ws-MachineIndex PIC 9(3) VALUE 1.
        01 ws-MachineList.
-       05 ws-MachineNum PIC 9(5) OCCURS 100 TIMES.
+           05 ws-MachineNum PIC 9(5) OCCURS 100 TIMES.
 
        PROCEDURE DIVISION.
        Begin.
@@ -38,15 +51,27 @@
        AddMachine.
        DISPLAY "Enter Machine Number to add: "
        ACCEPT ws-MachineNumber
-       MOVE ws-MachineNumber TO ws-MachineNum(ws-MachineIndex)
+       PERFORM AppendMachineToFile
        ADD 1 TO ws-MachineIndex
        PERFORM DisplayMenu.
 
        CheckMachineNumbers.
-       DISPLAY "Machine Numbers in the company:"
-           PERFORM VARYING ws-MachineIndex FROM 1 BY 1 UNTIL 
-           ws-MachineIndex > 100
-           IF ws-MachineNum(ws-MachineIndex) NOT = 0
-               DISPLAY ws-MachineNum(ws-MachineIndex)
-           END-PERFORM
-       PERFORM DisplayMenu.
+           OPEN INPUT MachineFile
+           READ MachineFile INTO MachineRecord
+           AT END
+              DISPLAY "No machine numbers stored yet."
+           NOT AT END
+               PERFORM UNTIL ws-MachineIndex > 100
+                 DISPLAY MachineNum
+                 READ MachineFile INTO MachineRecord
+                 AT END
+                     EXIT PERFORM
+            END-PERFORM
+           CLOSE MachineFile
+           PERFORM DisplayMenu.
+
+       AppendMachineToFile.
+           OPEN EXTEND MachineFile
+           WRITE MachineRecord FROM ws-MachineNumber
+           CLOSE MachineFile.
+           STOP RUN.
