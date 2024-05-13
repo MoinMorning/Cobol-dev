@@ -36,38 +36,38 @@
 
        PROCEDURE DIVISION.
        Begin.
-       PERFORM DisplayMenu UNTIL ws-MenuOption = 3
-       STOP RUN.
+           PERFORM DisplayMenu UNTIL ws-MenuOption = 4
+           STOP RUN.
 
        DisplayMenu.
-       DISPLAY "Company Admin System"
-       DISPLAY "1. Add Machine Number"
-       DISPLAY "2. Check Machine Numbers"
-       DISPLAY "3. Delete Machine Number"
-       DISPLAY "4. Exit"
+           DISPLAY "Company Admin System"
+           DISPLAY "1. Add Machine Number"
+           DISPLAY "2. Check Machine Numbers"
+           DISPLAY "3. Delete Machine Number"
+           DISPLAY "4. Exit"
        ACCEPT ws-MenuOption
-       PERFORM MenuAction.
+           PERFORM MenuAction.
 
        MenuAction.
-       EVALUATE ws-MenuOption
-        WHEN 1
+           EVALUATE ws-MenuOption
+           WHEN 1
             PERFORM AddMachine
-        WHEN 2
+           WHEN 2
             PERFORM CheckMachineNumbers
-        WHEN 3
+           WHEN 3
             PERFORM DeleteMachine
-        WHEN 4
+           WHEN 4
             EXIT PROGRAM
         WHEN OTHER
             DISPLAY "Invalid option. Please try again."
        END-EVALUATE.
 
        AddMachine.
-       DISPLAY "Enter Machine Number to add: "
+           DISPLAY "Enter Machine Number to add: "
        ACCEPT ws-MachineNumber
-       PERFORM AppendMachineToFile
-       ADD 1 TO ws-MachineIndex
-       PERFORM DisplayMenu.
+           PERFORM AppendMachineToFile
+           ADD 1 TO ws-MachineIndex
+           PERFORM DisplayMenu.
 
        CheckMachineNumbers.
            OPEN INPUT MachineFile
@@ -83,7 +83,6 @@
             END-PERFORM
            CLOSE MachineFile
            PERFORM DisplayMenu.
-
        DeleteMachine.
            DISPLAY "Enter Machine Number to delete: "
            ACCEPT ws-MachineNumber 
@@ -106,8 +105,6 @@
                    END-PERFORM
            CLOSE MachineFile 
            CLOSE TempMachineFile
-           DELETE "machines.txt"
-           RENAME "temp_machines.txt" TO "machines.txt"
            PERFORM DisplayMenu.
 
        AppendMachineToFile.
