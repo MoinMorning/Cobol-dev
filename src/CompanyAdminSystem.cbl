@@ -6,15 +6,26 @@
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT MachineFile ASSIGN TO "machines.txt"
-                  ORGANIZATION IS LINE SEQUENTIAL.
+                  ORGANIZATION IS LINE SEQUENTIAL
+                  ACCESS MODE IS SEQUENTIAL.
+
+           SELECT TempMachineFile ASSIGN TO "temp_machines.txt"
+                  ORGANIZATION IS LINE SEQUENTIAL
+                  ACCESS MODE IS SEQUENTIAL.
 
        DATA DIVISION.
        FILE SECTION.
        FD MachineFile.
        01 MachineRecord.
            05 MachineNum PIC 9(5).
+           05 MachineTyp PIC X(5).
+           05 MachineManu PIC X(5).
 
-
+       FD TempMachineFile.
+       01 TempMachineRecord.
+           05 TempMachineNum PIC 9(5).
+           05 TempMachineTyp PIC X(5).
+           05 TempMachineManu PIC X(5).
 
        WORKING-STORAGE SECTION.
        01 ws-MenuOption PIC 9.
@@ -32,7 +43,8 @@
        DISPLAY "Company Admin System"
        DISPLAY "1. Add Machine Number"
        DISPLAY "2. Check Machine Numbers"
-       DISPLAY "3. Exit"
+       DISPLAY "3. Delete Machine Number"
+       DISPLAY "4. Exit"
        ACCEPT ws-MenuOption
        PERFORM MenuAction.
 
@@ -43,6 +55,8 @@
         WHEN 2
             PERFORM CheckMachineNumbers
         WHEN 3
+            PERFORM DeleteMachine
+        WHEN 4
             EXIT PROGRAM
         WHEN OTHER
             DISPLAY "Invalid option. Please try again."
@@ -68,6 +82,32 @@
                      EXIT PERFORM
             END-PERFORM
            CLOSE MachineFile
+           PERFORM DisplayMenu.
+
+       DeleteMachine.
+           DISPLAY "Enter Machine Number to delete: "
+           ACCEPT ws-MachineNumber 
+           OPEN INPUT MachineFile
+           OPEN OUTPUT TempMachineFile
+           READ MachineFile INTO MachineRecord
+               AT END
+                  DISPLAY "No machine numbers stored yet."
+               NOT AT END
+                   PERFORM UNTIL ws-MachineIndex > 100
+                       IF MachineNum NOT EQUAL TO ws-MachineNumber 
+                             MOVE MachineNum TO TempMachineNum
+                             MOVE MachineTyp TO TempMachineTyp
+                             MOVE MachineManu TO TempMachineManu
+                             WRITE TempMachineRecord
+                       END-IF 
+                       READ MachineFile INTO MachineRecord
+                          AT END
+                              EXIT PERFORM 
+                   END-PERFORM
+           CLOSE MachineFile 
+           CLOSE TempMachineFile
+           DELETE "machines.txt"
+           RENAME "temp_machines.txt" TO "machines.txt"
            PERFORM DisplayMenu.
 
        AppendMachineToFile.
