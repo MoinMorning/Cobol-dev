@@ -44,7 +44,8 @@
            DISPLAY "1. Add Machine Number"
            DISPLAY "2. Check Machine Numbers"
            DISPLAY "3. Delete Machine Number"
-           DISPLAY "4. Exit"
+           DISPLAY "4. Search Machine Number"
+           DISPLAY "5. Exit"
        ACCEPT ws-MenuOption
            PERFORM MenuAction.
 
@@ -57,6 +58,8 @@
            WHEN 3
             PERFORM DeleteMachine
            WHEN 4
+            PERFORM SearchMachine  
+           WHEN 5
             EXIT PROGRAM
         WHEN OTHER
             DISPLAY "Invalid option. Please try again."
@@ -106,9 +109,31 @@
            CLOSE MachineFile 
            CLOSE TempMachineFile
            PERFORM DisplayMenu.
-
+        
+        SearchMachine.
+           DISPLAY "Enter Machine Number to search: "
+           ACCEPT ws-MachineNumber 
+           OPEN INPUT MachineFile
+           READ MachineFile INTO MachineRecord
+               AT END
+            DISPLAY "No machine numbers stored yet."
+               NOT AT END
+            PERFORM UNTIL ws-MachineIndex > 100
+                IF MachineNum EQUAL TO ws-MachineNumber 
+                    DISPLAY "Machine Number found: " MachineNum
+                    EXIT PERFORM
+                END-IF 
+                READ MachineFile INTO MachineRecord
+                    AT END
+                        DISPLAY "Machine Number not found."
+                        EXIT PERFORM 
+            END-PERFORM
+              CLOSE MachineFile
+               PERFORM DisplayMenu.
+       
        AppendMachineToFile.
            OPEN EXTEND MachineFile
            WRITE MachineRecord FROM ws-MachineNumber
            CLOSE MachineFile.
            STOP RUN.
+  
