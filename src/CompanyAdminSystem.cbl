@@ -36,7 +36,7 @@
 
        PROCEDURE DIVISION.
        Begin.
-           PERFORM DisplayMenu UNTIL ws-MenuOption = 4
+           PERFORM DisplayMenu UNTIL ws-MenuOption = 5
            STOP RUN.
 
        DisplayMenu.
@@ -46,7 +46,7 @@
            DISPLAY "3. Delete Machine Number"
            DISPLAY "4. Search Machine Number"
            DISPLAY "5. Exit"
-       ACCEPT ws-MenuOption
+           ACCEPT ws-MenuOption
            PERFORM MenuAction.
 
        MenuAction.
@@ -61,8 +61,6 @@
             PERFORM SearchMachine  
            WHEN 5
             EXIT PROGRAM
-        WHEN OTHER
-            DISPLAY "Invalid option. Please try again."
        END-EVALUATE.
 
        AddMachine.
@@ -135,5 +133,4 @@
            OPEN EXTEND MachineFile
            WRITE MachineRecord FROM ws-MachineNumber
            CLOSE MachineFile.
-           STOP RUN.
   
