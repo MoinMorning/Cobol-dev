@@ -1,14 +1,2 @@
-00002
-00001
-00000
-00000
-00000
-00000
-00000
-00001
-00000
-22222          2
-12344          123
-99999          a
-05700          ab
-57000          eee
+MachineNMachiMachiUsername            MachineSpec
+57004   MachiMachilek                 Acer

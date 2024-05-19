@@ -21,7 +21,7 @@
        FILE SECTION.
        FD MachineFile.
        01 MachineRecord.
-           05 MachineNum PIC X(5).
+           05 MachineNum PIC X(8).
            05 MachineTyp PIC X(5).
            05 MachineManu PIC X(5).
            05 MachineUsername PIC X(20).
@@ -32,7 +32,9 @@
            05 TempMachineNum PIC X(5).
            05 TempMachineTyp PIC X(5).
            05 TempMachineManu PIC X(5).
-
+           05 TempMachineUsername PIC X(20).
+           05 TempMachineSpec PIC X(50).
+       
        WORKING-STORAGE SECTION.
        01 ws-MachineFile-Status PIC 99. 
        01 ws-MenuOption PIC 9.
@@ -44,13 +46,25 @@
        01 ws-MachineSpec PIC X(50).
 
        PROCEDURE DIVISION.
-           
+           PERFORM InitializeFile
            OPEN INPUT MachineFile
            IF ws-MachineFile-Status NOT EQUAL 00
               DISPLAY "Error opening MachineFile: " 
               ws-MachineFile-Status
-             STOP RUN.
-           
+           END-IF 
+             CLOSE MachineFile.
+       
+
+       InitializeFile.
+           OPEN OUTPUT MachineFile
+           MOVE "MachineNum" TO MachineNum
+           MOVE "MachineTyp" TO MachineTyp
+           MOVE "Username" TO MachineUsername
+           MOVE "MachineSpec" TO MachineSpec
+           WRITE MachineRecord
+           CLOSE MachineFile
+           OPEN EXTEND MachineFile.
+       
        
        Begin.
            PERFORM DisplayMenu UNTIL ws-MenuOption = 5
@@ -58,7 +72,7 @@
 
        DisplayMenu.
            DISPLAY "Company Admin System"
-           DISPLAY "1. Add Machine Number"
+           DISPLAY "1. Add Machine Information"
            DISPLAY "2. Check Machine Numbers"
            DISPLAY "3. Delete Machine Number"
            DISPLAY "4. Search Machine Number"
@@ -93,6 +107,7 @@
 
            DISPLAY "Enter Username: "
            ACCEPT Username
+           
            IF Username EQUAL SPACES
            DISPLAY "Username cannot be empty."
            GO TO DisplayMenu
@@ -127,8 +142,8 @@
            PERFORM DisplayMenu.
 
        DeleteMachine.
-           DISPLAY "Enter Machine Number to delete: "
-           ACCEPT ws-MachineNumber 
+           DISPLAY "Enter username to delete: "
+           ACCEPT Username  
            OPEN INPUT MachineFile
            OPEN OUTPUT TempMachineFile
            READ MachineFile INTO MachineRecord
@@ -136,10 +151,14 @@
                   DISPLAY "No machine numbers stored yet."
                NOT AT END
                    PERFORM UNTIL ws-MachineIndex > 100
-                       IF MachineNum NOT EQUAL TO ws-MachineNumber 
+                       IF MachineNum NOT EQUAL TO Username  
                              MOVE MachineNum TO TempMachineNum
                              MOVE MachineTyp TO TempMachineTyp
                              MOVE MachineManu TO TempMachineManu
+                             MOVE MachineUsername TO TempMachineUsername
+                             OF TempMachineRecord
+                             MOVE MachineSpec TO TempMachineSpec 
+                             OF TempMachineRecord
                              WRITE TempMachineRecord
                        END-IF 
                        READ MachineFile INTO MachineRecord
@@ -161,6 +180,10 @@
             PERFORM UNTIL ws-MachineIndex > 100
                 IF MachineNum EQUAL TO ws-MachineNumber 
                     DISPLAY "Machine Number found: " MachineNum
+                    DISPLAY "Machine Type: " MachineTyp
+                    DISPLAY "Machine Manufacturer: " MachineManu
+                    DISPLAY "Machine Username: " MachineUsername
+                    DISPLAY "Machine Specifications: " MachineSpec
                     EXIT PERFORM
                 END-IF 
                 READ MachineFile INTO MachineRecord
@@ -175,7 +198,7 @@
            OPEN EXTEND MachineFile
            MOVE ws-MachineNumber TO MachineNum
            MOVE Username TO MachineUsername  OF MachineRecord
-           MOVE MachineSpec  TO MachineSpec OF MachineRecord
+           MOVE ws-MachineSpec  TO MachineSpec OF MachineRecord
            WRITE MachineRecord
            CLOSE MachineFile.
 
