@@ -1,2 +1,1 @@
-MachineNMachiMachiUsername            MachineSpec
-57004   MachiMachilek                 Acer
+Num        Typ       ManufacturUsername            Spec
